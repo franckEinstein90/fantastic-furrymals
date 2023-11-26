@@ -4,7 +4,7 @@ import {engine} from 'express-handlebars';
 const app = express();
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
-
+app.use(express.static('public'));
 const port = process.env.PORT || 3000;
 
 // Routes
