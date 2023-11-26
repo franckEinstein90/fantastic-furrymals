@@ -11,6 +11,12 @@ const port = process.env.PORT || 3000;
 app.get('/', (req, res) => {
     res.render('home');
 });
+
+// Routes
+app.get('/workspace', (req, res) => {
+  res.render('workspace');
+});
+
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
