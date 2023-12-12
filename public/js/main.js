@@ -10,7 +10,7 @@ $(document).ready(() =>{
 		event.preventDefault();
 		const message = $("#message").val();     
 		$("#message").val('');
-		alert(`The message is: `);
+		alert(`The message is: ${message}`);
 	});
 
 	$('#live-chat header').on('click', function() {
