@@ -3,7 +3,7 @@ import {createServer} from 'node:http';
 import {engine} from 'express-handlebars';
 import {Server} from "socket.io";
 
-const app = express();
+export const app = express();
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
 app.use(express.static('public'));
