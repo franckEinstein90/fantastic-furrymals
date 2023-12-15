@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+//import open from 'open'
 import {createServer} from 'node:http';
 import {engine} from 'express-handlebars';
 import {Server} from "socket.io";
@@ -23,12 +24,12 @@ app.get('/workspace', (req, res) => {
 
 server.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
+//  open(`http://localhost:${port}`)
 });
 
 io.on('connection', (socket)=> {
-  console.log("some user connected");
-
-  io.emit('update', {property: "prop", value: "fdsa"})
+  console.log("some user connected");;
+  io.emit('update', {property: "prop", value: "fdsa"});
   socket.on('disconnect', ()=> {
     console.log('user disconnected');
   });

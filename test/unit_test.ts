@@ -3,6 +3,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import {app} from '../dist/main.js'
 import { expect } from 'chai';
+import { describe, it } from 'node:test';
 
 // Configure chai to use chai-http
 chai.use(chaiHttp);
