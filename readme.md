@@ -1,4 +1,4 @@
-# Node Chat Application
+# Fantastic-Furrymals - wacky chat application
 
 This project is a chat application built with Node.js, using Express as the web server and Handlebars as the templating engine. It demonstrates a basic chat functionality with a frontend implemented in Handlebars.
 
