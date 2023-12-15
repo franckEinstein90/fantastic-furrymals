@@ -25,7 +25,8 @@ cd [Your Repository Directory]
 npm install
 ```
 
-Scripts
+## Scripts
+
 The package.json includes the following scripts for development and building the application:
 ```
 "scripts": {
