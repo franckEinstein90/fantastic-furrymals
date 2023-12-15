@@ -35,9 +35,9 @@ The package.json includes the following scripts for development and building the
 },
 ```
 
-npm test runs the TypeScript unit tests.
-npm run build cleans the distribution directory and compiles the TypeScript files.
-npm start compiles the TypeScript files and starts the application with nodemon for auto-reloading.
+* npm test runs the TypeScript unit tests.
+* npm run build cleans the distribution directory and compiles the TypeScript files.
+* npm start compiles the TypeScript files and starts the application with nodemon for auto-reloading.
 
 ## Application Structure
 /src - Contains the TypeScript source files.
