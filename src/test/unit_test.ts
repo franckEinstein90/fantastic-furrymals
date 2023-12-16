@@ -1,48 +1,44 @@
 // Import necessary modules
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import { expect } from 'chai';
-import express from 'express';
-import {createServer} from 'node:http';
-import { engine } from 'express-handlebars';
+import {expect} from 'chai';
+import winston from 'winston';
+import {FurryMallsApp} from '../server/types';
+import {appFactory} from '../server/appFactory';
 
-const port = process.env.PORT || 3000;
-const app = express();
-const server = createServer(app);
-app.engine('handlebars', engine());
-app.set('view engine', 'handlebars');
-app.use(express.static('public'));
+
+let furryMalsTestApp: FurryMallsApp
+
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.Console({
+      format: winston.format.simple(),
+    }),
+  ],
+});
+
+
+const before = async ()=>{
+  furryMalsTestApp = await appFactory(logger);
+}
 
 // Configure chai to use chai-http
 chai.use(chaiHttp);
 
-app.get('/', (req, res) => {
-  res.render('home')
 
-})
+describe('FurryMals App Server', () => {
 
-server.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
-
-describe('Server', () => {
-  // Test to check if the server is running successfully
   it('should return a 200 status when accessing the root endpoint', (done) => {
-    chai.request(app)
+    chai.request(furryMalsTestApp.app)
       .get('/')
       .end((err:any, res:any) => {
-        // Assert that there are no errors
         expect(err).to.be.null;
-
-        // Assert that the status code is 200
         expect(res).to.have.status(200);
-
-        // Call done to finish the test
         done();
-
-        // Stop the server
-        server.close();
-
+        furryMalsTestApp.httpServer.close();
       });
   });
+
 });
