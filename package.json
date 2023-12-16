@@ -6,8 +6,14 @@
   "directories": {
     "test": "test"
   },
+  "nyc": {
+    "extension": [".ts", ".tsx"],
+    "exclude": ["**/*.d.ts"],
+    "reporter": ["lcov", "text-summary"],
+    "all": true
+  },
   "scripts": {
-    "test": "mocha -r ts-node/register ./test/*.ts",
+    "test": "nyc mocha -r ts-node/register ./test/*.ts",
     "build": "rimraf dist && tsc",
     "start": "tsc && nodemon './dist/main.js'"
   },
@@ -22,6 +28,7 @@
     "@types/node": "^20.10.0",
     "chai": "^4.3.10",
     "mocha": "^10.2.0",
+    "nyc": "^15.1.0",
     "tslib": "^2.6.2"
   },
   "dependencies": {

@@ -1,3 +1,8 @@
+import dotenv from 'dotenv';
+import path from 'node:path'
+
+dotenv.config({path: path.resolve(__dirname, '.env')});
+
 import express, {Express} from 'express';
 import {createServer} from 'node:http';
 import {engine} from 'express-handlebars';

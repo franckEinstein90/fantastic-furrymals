@@ -30,15 +30,9 @@ chai.use(chaiHttp);
 
 describe('FurryMals App Server', () => {
 
-  it('should return a 200 status when accessing the root endpoint', (done) => {
-    chai.request(furryMalsTestApp.app)
-      .get('/')
-      .end((err:any, res:any) => {
-        expect(err).to.be.null;
-        expect(res).to.have.status(200);
-        furryMalsTestApp.shutDown();
-        done();
-      });
+  it('should return a 200 status when accessing the root endpoint', async ( ) => {
+    const res = await chai.request(furryMalsTestApp.app).get('/');
+    expect(res).to.have.status(200);
+    await furryMalsTestApp.shutDown();
   });
-
 });
