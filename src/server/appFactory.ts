@@ -21,7 +21,7 @@ export const appFactory = async (logger: winston.Logger): Promise<FurryMallsApp>
   });
 
   app.get('/workspace', (req, res) => {
-    res.render('workspace');
+    res.render('workspace', { data: "yourData" });
   });
 
   const httpServer = createServer(app);

@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha './dist/test/*.js'",
+    "test": "mocha -r ts-node/register ./test/*.ts",
     "build": "rimraf dist && tsc",
     "start": "tsc && nodemon './dist/main.js'"
   },

@@ -3,11 +3,11 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import {expect} from 'chai';
 import winston from 'winston';
-import {FurryMallsApp} from '../server/types';
-import {appFactory} from '../server/appFactory';
+import { FurryMallsApp } from '../src/server/types'; 
+import { appFactory } from '../src/server/appFactory';
 
 
-let furryMalsTestApp: FurryMallsApp
+let furryMalsTestApp: FurryMallsApp;
 
 const logger = winston.createLogger({
   level: 'info',
@@ -20,9 +20,9 @@ const logger = winston.createLogger({
 });
 
 
-const before = async ()=>{
+before(async ()=>{
   furryMalsTestApp = await appFactory(logger);
-}
+})
 
 // Configure chai to use chai-http
 chai.use(chaiHttp);
@@ -36,8 +36,8 @@ describe('FurryMals App Server', () => {
       .end((err:any, res:any) => {
         expect(err).to.be.null;
         expect(res).to.have.status(200);
+        furryMalsTestApp.shutDown();
         done();
-        furryMalsTestApp.httpServer.close();
       });
   });
 
