@@ -9,17 +9,29 @@ $(document).ready(() =>{
 
 	const charBuffer = []
 	const process_keycode = (event)=>{
+		if (event.key === 'Backspace')
+		{
+			$("#message").val(charBuffer.pop());
+			$("#title").html(charBuffer.pop())
+		}
+		else {
 		charBuffer.push(event.key);
 		$("#message").val(charBuffer.join(''));
 		$("#title").html(charBuffer.join(''));
-	};
+		}
+	}
+
+
 
 	$("#message").keydown((event) => {
 		event.preventDefault();
 		if(	event.keyCode === 32 
-			|| (event.keyCode >= 48 && event.keyCode <= 126)){
-			process_keycode(event);
+			|| (event.keyCode >= 48 && event.keyCode <= 126) || (event.keyCode >=186 && event.keyCode <=191)
+			|| event.keyCode ==8)
+			{
+			process_keycode(event);		
 		}
+
 	});
 
 	$("#send-message").on('click', (event)=>{
