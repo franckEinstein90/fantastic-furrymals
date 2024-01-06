@@ -7,7 +7,7 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
+            "name": "Start Server",
             "runtimeArgs": ["-r", "ts-node/register"],
             "args": ["${workspaceFolder}/src/main.ts"], // Replace with your main TypeScript file
             "console": "integratedTerminal"

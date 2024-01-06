@@ -1,6 +1,9 @@
 @charset "utf-8";
 /* CSS Document */
 
+* {
+	box-sizing: border-box;
+}
 
 body {
 	background: #e9e9e9;
@@ -78,7 +81,7 @@ p { margin: 0; }
 	font-size: 12px;
 	right: 24px;
 	position: fixed;
-	width: 300px;
+	width: 90vw;
 }
 
 #live-chat header {
@@ -116,7 +119,7 @@ p { margin: 0; }
 	border-radius: 3px;
 	padding: 8px;
 	outline: none;
-	width: 234px;
+	width: 80vw;
 }
 
 .chat-message-counter {

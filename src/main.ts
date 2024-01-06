@@ -33,9 +33,15 @@ const main = async ():Promise<void> => {
 
     io.emit('update', {property: "prop", value: "fdsa"});
 
+    socket.on('chat message', (msg)=> {
+      console.log(msg);
+    });
+ 
     socket.on('disconnect', ()=> {
       console.log('user disconnected');
     });
+  
+
   })
 
 }
