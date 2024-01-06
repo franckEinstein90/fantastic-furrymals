@@ -2,7 +2,6 @@
   "name": "fantastic-furrymals",
   "version": "1.0.0",
   "description": "starter project babylonjs + webXR",
-  "main": "main.ts",
   "directories": {
     "test": "test"
   },
@@ -15,7 +14,7 @@
   "scripts": {
     "test": "nyc mocha -r ts-node/register ./test/*.ts",
     "build": "rimraf dist && tsc",
-    "start": "tsc && nodemon './dist/main.js'"
+    "start": "npx ts-node ./src/main.ts"
   },
   "keywords": [],
   "author": "",

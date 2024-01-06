@@ -1,7 +1,11 @@
+import dotenv from 'dotenv';
+import path from 'node:path'
+
+dotenv.config({path: path.resolve(__dirname, '.env')});
+
 import { appFactory } from './server/appFactory';
 import winston from 'winston'
 
-// Create a logger instance
 const logger = winston.createLogger({
     level: 'info',
     format: winston.format.json(),

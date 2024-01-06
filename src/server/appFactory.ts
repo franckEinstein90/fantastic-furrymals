@@ -1,8 +1,4 @@
-import dotenv from 'dotenv';
 import path from 'node:path'
-
-dotenv.config({path: path.resolve(__dirname, '.env')});
-
 import express, {Express} from 'express';
 import {createServer} from 'node:http';
 import {engine} from 'express-handlebars';
@@ -18,7 +14,14 @@ export const appFactory = async (logger: winston.Logger): Promise<FurryMallsApp>
   const port = process.env.PORT || 3000;
   /********************************************************/
   app.engine('handlebars', engine());
-  app.set('view engine', 'handlebars');
+  app.engine('hbs', engine({
+    extname: 'handlebars',
+    defaultLayout: 'main',
+    layoutsDir: path.join(__dirname, 'views/layouts'),
+    partialsDir: path.join(__dirname, 'views/partials')
+  }));
+  app.set('view engine', 'hbs');
+//  app.set('view engine', 'handlebars');
   app.use(express.static('public'));
   /********************************************************/
   app.get('/', (req, res) => {
