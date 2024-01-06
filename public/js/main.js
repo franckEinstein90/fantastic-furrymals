@@ -1,3 +1,5 @@
+const charBuffer = [];
+
 $(document).ready(() =>{
 
 	/*************************************************************************/
@@ -7,21 +9,21 @@ $(document).ready(() =>{
 		console.log("data")
 	});
 
-	const charBuffer = []
-	const process_keycode = (event)=>{
-		if (event.key === 'Backspace')
-		{
-			$("#message").val(charBuffer.pop());
-			$("#title").html(charBuffer.pop())
-		}
-		else {
-		charBuffer.push(event.key);
+	
+	const updateUserMessages = ()=>{
+		const message = charBuffer.join('');
 		$("#message").val(charBuffer.join(''));
 		$("#title").html(charBuffer.join(''));
-		}
+
 	}
 
-
+	const process_keycode = (event)=>{
+		if (event.key === 'Backspace') { 
+			const lastChar = charBuffer.pop(); 
+		} else { 
+			charBuffer.push(event.key);
+		}
+	}
 
 	$("#message").keydown((event) => {
 		event.preventDefault();
