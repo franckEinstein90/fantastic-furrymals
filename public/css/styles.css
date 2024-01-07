@@ -67,6 +67,46 @@ input {
 
 p { margin: 0; }
 
+
+/* ---------- LOGIN ---------- */
+.form-container {
+	box-sizing: border-box;
+	margin: 0 auto;
+	max-width: 25em;
+	transition: all .5s ease-in-out;  
+	background: white;
+	padding: 1.5em;
+	border-radius: 1em;
+	box-shadow: 0px 0px 1em #ddd;  
+}
+.form-container label { 
+	color: #d9534f ; 
+	width: 100%;
+	text-align: center;
+}
+
+.form-container .btn { 
+	margin-top: 10px;
+	width: 90%;
+	margin-left:5%;
+	background: #d9534f; 
+}
+.form-container .btn:hover { background: #c9302c; }
+.form-container .btn:active { background: #c9302c; }
+.form-container .btn:focus { background: #c9302c; }
+.form-container .btn:active:focus { background: #c9302c; }
+.form-container .btn:active:hover { background: #ac2925; }
+
+
+
+.off-canvas {
+  transform:  
+    translateZ(0) 
+    translate(0,-400px)
+    rotateY(-360deg);
+  height: 0;
+}
+
 .clearfix { *zoom: 1; } /* For IE 6/7 */
 .clearfix:before, .clearfix:after {
     content: "";

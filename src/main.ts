@@ -25,12 +25,14 @@ const logger = winston.createLogger({
 
 const main = async ():Promise<void> => {
 
-  const furryMalsApp = await appFactory(logger);
-  const io = furryMalsApp.io;
 
+  const furryMalsApp = await appFactory({
+    logger
+  });
+
+  const io = furryMalsApp.io;
   io.on('connection', (socket)=> {
     console.log("some user connected");
-
     io.emit('update', {property: "prop", value: "fdsa"});
 
     socket.on('chat message', (msg)=> {
@@ -40,8 +42,6 @@ const main = async ():Promise<void> => {
     socket.on('disconnect', ()=> {
       console.log('user disconnected');
     });
-  
-
   })
 
 }

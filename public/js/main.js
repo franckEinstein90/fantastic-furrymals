@@ -4,12 +4,25 @@ $(document).ready(() =>{
 
 	/*************************************************************************/
 	/* Web socket events *****************************************************/
+
 	const socket = io();
 	socket.on('update', function(data){
 		console.log("data")
 	});
+	/*************************************************************************/
+	/* login form ************************************************************/
 
-	const updateUserMessages = ()=>{
+	const $loginForm = $("#form-signin");
+	$(".form-container").removeClass("off-canvas");
+	$('#live-chat').fadeOut(300);		
+	$('#form-signin').submit((event) => {
+        event.preventDefault(); 
+        alert('Form submitted!');
+    });
+	/*************************************************************************/
+	/* chat user *************************************************************/
+
+	const updateUserMessages = () => {
 		const message = charBuffer.join('');
 		$("#message").val(charBuffer.join(''));
 		$("#title").html(charBuffer.join(''));

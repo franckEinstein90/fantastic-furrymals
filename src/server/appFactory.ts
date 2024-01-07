@@ -3,15 +3,17 @@ import express, {Express} from 'express';
 import {createServer} from 'node:http';
 import {engine} from 'express-handlebars';
 import {Server as SocketIOServer} from "socket.io";
-import {FurryMallsApp} from './types';
+import {FurryMallsApp, FurryMallsAppFactoryOptions} from './types';
 import winston from 'winston';
 
-export const appFactory = async (logger: winston.Logger): Promise<FurryMallsApp> => {
-
+export const appFactory = async (options: FurryMallsAppFactoryOptions): Promise<FurryMallsApp> => {
   /********************************************************/
+
+  const logger = options.logger;
   const app: Express = express();
   const port = process.env.PORT || 3000;
   /********************************************************/
+
   app.engine('handlebars', engine());
   /*app.engine('hbs', engine({
     extname: 'handlebars',
@@ -24,8 +26,13 @@ export const appFactory = async (logger: winston.Logger): Promise<FurryMallsApp>
   /********************************************************/
 
   app.get('/', (req, res) => {
-    res.render('home');
+    res.render('home', {title: 'Home page', userName: 'Franck'} );
   });
+
+  app.get('/about', (req, res) => {
+    res.render('about', {title: 'About page'});
+  });
+
 
   app.get('/workspace', (req, res) => {
     res.render('workspace', { data: "yourData" });

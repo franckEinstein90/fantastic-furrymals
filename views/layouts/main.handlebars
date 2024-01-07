@@ -9,12 +9,26 @@
     <link rel="stylesheet" type="text/css" href="/css/styles.css">
 </head>
 <body>
-  <nav>
-  <button id="loginButton">Login</button>
-</nav>
-    <div class="container">
-    {{{body}}}
+    <!--<nav>
+      <button style="background-Color:blue"id="loginButton">Login</button>
+    </nav>-->
+
+    <div class="form-container off-canvas">
+      <form role="form" id="form-signin">
+        <div class="form-group">
+          <label class="form-label" for="userName">choose a name</label>
+          <input type="name" id="userName" class="form-control" />
+        </div>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+        <BR/>
+      </form>
     </div>
+
+
+    <div class="container">
+      {{{body}}}
+    </div>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
     <script src="/js/main.js"></script>
 
