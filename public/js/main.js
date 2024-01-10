@@ -16,9 +16,16 @@ $(document).ready(() =>{
 	$(".form-container").removeClass("off-canvas");
 	$('#live-chat').fadeOut(300);		
 	$('#form-signin').submit((event) => {
-        event.preventDefault(); 
+        event.preventDefault();
+	    $('#form-signin').fadeOut(300);	
+		$('#live-chat').fadeIn(300);		
+		charBuffer.push(event.currentTarget[0].value)
+		$("#message").val(charBuffer.join(''));
+		$("#title").html(charBuffer.join(''));
         alert('Form submitted!');
     });
+
+
 	/*************************************************************************/
 	/* chat user *************************************************************/
 
@@ -50,7 +57,7 @@ $(document).ready(() =>{
 
 	$("#send-message").on('click', (event)=>{
 		event.preventDefault();
-		socket.emit('chat message', charBuffer.join(''));
+		socket.emit('chat message',charBuffer);
 		charBuffer.length = 0;
 		updateUserMessages();
 	});
