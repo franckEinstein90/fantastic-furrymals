@@ -57,7 +57,7 @@ $(document).ready(() =>{
 
 	$("#send-message").on('click', (event)=>{
 		event.preventDefault();
-		socket.emit('chat message',charBuffer);
+		socket.emit('chat message',charBuffer.join(''));
 		charBuffer.length = 0;
 		updateUserMessages();
 	});
