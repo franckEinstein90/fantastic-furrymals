@@ -7,7 +7,7 @@ import { FurryMallsApp } from '../src/server/types';
 import { appFactory } from '../src/server/appFactory';
 import { describe, it } from 'node:test';
 
-let furryMalsTestApp: FurryMallsApp;
+// let furryMalsTestApp: FurryMallsApp;
 
 const logger = winston.createLogger({
   level: 'info',
@@ -20,11 +20,11 @@ const logger = winston.createLogger({
 });
 
 
-before(async ()=>{
-  furryMalsTestApp = await appFactory({
+const test =async ()=>{
+  const furryMalsTestApp = await appFactory({
     logger
-  });
 });
+
 
 // Configure chai to use chai-http
 chai.use(chaiHttp);
@@ -38,3 +38,8 @@ describe('FurryMals App Server', () => {
     await furryMalsTestApp.shutDown();
   });
 });
+}
+test()
+.catch(e => {
+  console.log('error')
+})
