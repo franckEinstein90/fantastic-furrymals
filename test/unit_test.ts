@@ -21,8 +21,10 @@ const logger = winston.createLogger({
 
 
 before(async ()=>{
-  furryMalsTestApp = await appFactory(logger);
-})
+  furryMalsTestApp = await appFactory({
+    logger
+  });
+});
 
 // Configure chai to use chai-http
 chai.use(chaiHttp);
