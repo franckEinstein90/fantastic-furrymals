@@ -25,6 +25,10 @@ interface ChatMessage {
   timestamp: string;
 }
 
+interface WindowCountMessage {
+  count: number;
+}
+
 interface FurryMalsApp {
   io: SocketIOServer;
 }
@@ -33,10 +37,16 @@ const main = async (): Promise<void> => {
   const furryMalsApp: FurryMalsApp = await appFactory(logger);
   const io: SocketIOServer = furryMalsApp.io;
 
+  const emitWindowCount = (): void => {
+    const payload: WindowCountMessage = { count: io.of('/').sockets.size };
+    io.emit('window_count', payload);
+  };
+
   io.on('connection', (socket: Socket): void => {
     const userId = randomUUID();
     socket.data.user_id = userId;
     socket.emit('user_id', { user_id: userId });
+    emitWindowCount();
     logger.info(`user connected: ${userId}`);
 
     socket.on('chat message', (text: string): void => {
@@ -55,6 +65,7 @@ const main = async (): Promise<void> => {
     });
 
     socket.on('disconnect', (): void => {
+      emitWindowCount();
       logger.info(`user disconnected: ${socket.data.user_id}`);
     });
   });

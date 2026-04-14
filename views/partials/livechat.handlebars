@@ -3,17 +3,20 @@
 		<h4>Fantastic Furrymals</h4>
 	</header>
 
-	<div class="chat">
-		<div class="chat-history" id="chat-history">
-		</div> <!-- end chat-history -->
-
-		<form id="chat-form" action="#" method="post">
+	<div class="chat-compose">
+		<form id="chat-form" action="#" method="post" autocomplete="off">
 			<fieldset>
-				<input type="text" id="message" placeholder="type here" autofocus>
+				<textarea
+					id="message"
+					placeholder="type here"
+					autofocus
+					autocomplete="off"
+					autocorrect="off"
+					autocapitalize="off"
+					rows="3"
+				></textarea>
 				<button id="send-message" type="submit">Send</button>
 			</fieldset>
 		</form>
-
-	</div> <!-- end chat -->
-
-</div> <!-- end live-chat -->
+	</div>
+</div>

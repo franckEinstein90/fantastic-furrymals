@@ -42,11 +42,11 @@ export const appFactory = async (logger: winston.Logger): Promise<FurryMallsApp>
   app.use(express.static(publicDir));
 
   app.get('/', (req, res) => {
-    res.render('home');
+    res.render('home', { isHome: true });
   });
 
   app.get('/workspace', (req, res) => {
-    res.render('workspace', { data: "yourData" });
+    res.render('workspace', { data: "yourData", isWorkspace: true });
   });
 
   const httpServer = createServer(app);

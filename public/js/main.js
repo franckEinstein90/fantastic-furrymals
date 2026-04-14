@@ -1,6 +1,12 @@
 $(document).ready(() => {
   const socket = io();
   let currentUserId = null;
+  const renderWindowCount = (count) => {
+    const suffix = count === 1 ? '' : 's';
+    $('#window-count').text(`Windows: ${count}${suffix}`);
+  };
+
+  renderWindowCount(1);
 
   const appendMessage = (message) => {
     const messageDate = new Date(message.timestamp);
@@ -45,6 +51,12 @@ $(document).ready(() => {
     currentUserId = data.user_id;
   });
 
+  socket.on('window_count', (data) => {
+    if (typeof data?.count === 'number') {
+      renderWindowCount(data.count);
+    }
+  });
+
   $('#maximize-window').on('click', async () => {
     try {
       if (!document.fullscreenElement) {
@@ -58,15 +70,31 @@ $(document).ready(() => {
   });
 
   $('#open-home-window').on('click', () => {
-    window.open(
+    const windowName = `furrymalsHomeWindow-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const homeWindow = window.open(
       '/',
-      'furrymalsHomeWindow',
+      windowName,
       'width=960,height=700,left=120,top=80,menubar=yes,toolbar=yes,location=yes,status=yes,resizable=yes,scrollbars=yes'
     );
+
+    if (homeWindow) {
+      homeWindow.focus();
+      return;
+    }
+
+    window.location.href = '/';
+  });
+
+  $('#close-window').on('click', () => {
+    window.close();
+  });
+
+  $('#chat-history-toggle').on('click', () => {
+    $('#chat-history-pane').toggleClass('is-open');
   });
 
   $('#live-chat header').on('click', () => {
-    $('.chat').slideToggle(300, 'swing');
+    $('.chat-compose').slideToggle(300, 'swing');
   });
 
   $('.chat-close').on('click', (event) => {
