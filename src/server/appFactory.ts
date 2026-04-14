@@ -1,4 +1,5 @@
 import path from 'node:path'
+import fs from 'node:fs';
 import express, {Express} from 'express';
 import {createServer} from 'node:http';
 import {engine} from 'express-handlebars';
@@ -6,12 +7,29 @@ import {Server as SocketIOServer} from "socket.io";
 import {FurryMallsApp} from './types';
 import winston from 'winston';
 
-export const appFactory = async (logger: winston.Logger): Promise<FurryMallsApp> => {
+const resolveFirstExistingPath = (paths: string[]): string => {
+  for (const possiblePath of paths) {
+    if (fs.existsSync(possiblePath)) {
+      return possiblePath;
+    }
+  }
 
+  return paths[0];
+};
+
+export const appFactory = async (logger: winston.Logger): Promise<FurryMallsApp> => {
   const app: Express = express();
   const port = process.env.PORT || 3000;
-  const viewsDir = path.resolve(__dirname, '../../views');
-  const publicDir = path.resolve(__dirname, '../../public');
+  const viewsDir = resolveFirstExistingPath([
+    path.join(process.cwd(), 'views'),
+    path.join(process.cwd(), 'dist/views'),
+    path.resolve(__dirname, '../../views'),
+  ]);
+
+  const publicDir = resolveFirstExistingPath([
+    path.join(process.cwd(), 'public'),
+    path.resolve(__dirname, '../../public'),
+  ]);
 
   app.engine('handlebars', engine({
     extname: '.handlebars',
