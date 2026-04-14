@@ -1,1 +1,42 @@
-<h1>Workspace</h1>
+<div class="container my-5">
+  <table id="events-table" class="table table-striped table-hover">
+    <thead>
+      <tr>
+        <th>Event label</th>
+        <th>Event category</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!Array.isArray(window.AppSession?.events)) {
+      return;
+    }
+
+    const tableBody = document.querySelector('#events-table tbody');
+    if (!tableBody) {
+      return;
+    }
+
+    window.AppSession.events.forEach((eventItem) => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${eventItem.label}</td>
+        <td>${eventItem.category}</td>
+      `;
+      tableBody.appendChild(row);
+    });
+
+    if (window.DataTable) {
+      // DataTables v2 (vanilla)
+      // eslint-disable-next-line no-new
+      new DataTable('#events-table', {
+        pageLength: 5,
+        order: [[0, 'desc']],
+      });
+    }
+  });
+</script>
