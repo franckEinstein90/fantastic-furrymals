@@ -1,4 +1,8 @@
-$(document).ready(() => {
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = window.jQuery;
+  if (!$ || !$.fn.DataTable) {
+    return;
+  }
   if (!Array.isArray(window.sessionEvents)) {
     return;
   }

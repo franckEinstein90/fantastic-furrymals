@@ -1,4 +1,8 @@
-$(document).ready(() => {
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = window.jQuery;
+  if (!$) {
+    return;
+  }
   const eventList = $('#event-list');
   const canvasHost = document.getElementById('events-canvas');
   const modalElement = document.getElementById('eventDetailModal');
