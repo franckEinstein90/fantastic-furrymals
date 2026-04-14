@@ -195,6 +195,11 @@ p { margin: 0; }
 	margin-left: 56px;
 }
 
+.chat-message.own-message .chat-message-content h5,
+.chat-message.own-message .chat-message-content p {
+	color: #e62727;
+}
+
 .chat-time {
 	float: right;
 	font-size: 10px;

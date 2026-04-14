@@ -1,14 +1,17 @@
 $(document).ready(() => {
   const socket = io();
+  let currentUserId = null;
 
   const appendMessage = (message) => {
     const messageDate = new Date(message.timestamp);
     const timeText = Number.isNaN(messageDate.getTime())
       ? ''
       : messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const isOwnMessage = currentUserId && message.userId === currentUserId;
+    const ownMessageClass = isOwnMessage ? ' own-message' : '';
 
     $('#chat-history').append(`
-      <div class="chat-message clearfix">
+      <div class="chat-message clearfix${ownMessageClass}">
         <div class="chat-message-content">
           <span class="chat-time">${timeText}</span>
           <h5>${message.userId}</h5>
@@ -36,6 +39,10 @@ $(document).ready(() => {
 
   socket.on('chat message', (message) => {
     appendMessage(message);
+  });
+
+  socket.on('user_id', (data) => {
+    currentUserId = data.user_id;
   });
 
   $('#live-chat header').on('click', () => {
