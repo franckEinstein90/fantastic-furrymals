@@ -10,16 +10,18 @@ export const appFactory = async (logger: winston.Logger): Promise<FurryMallsApp>
 
   const app: Express = express();
   const port = process.env.PORT || 3000;
+  const viewsDir = path.resolve(__dirname, '../../views');
+  const publicDir = path.resolve(__dirname, '../../public');
 
-  app.engine('hbs', engine({
-    extname: 'handlebars',
+  app.engine('handlebars', engine({
+    extname: '.handlebars',
     defaultLayout: 'main',
-    layoutsDir: path.join(__dirname, '../views/layouts'),
-    partialsDir: path.join(__dirname, '../views/partials')
+    layoutsDir: path.join(viewsDir, 'layouts'),
+    partialsDir: path.join(viewsDir, 'partials')
   }));
-  app.set('view engine', 'hbs');
-  app.set('views', path.join(__dirname, '../views'));
-  app.use(express.static('public'));
+  app.set('view engine', 'handlebars');
+  app.set('views', viewsDir);
+  app.use(express.static(publicDir));
 
   app.get('/', (req, res) => {
     res.render('home');
