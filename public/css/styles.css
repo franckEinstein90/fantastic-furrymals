@@ -1,6 +1,11 @@
 @charset "utf-8";
 /* CSS Document */
 
+:root {
+	--top-nav-height: 5vh;
+	--chat-collapsed-height: 56px;
+}
+
 * {
 	box-sizing: border-box;
 }
@@ -16,33 +21,103 @@ body {
 	min-width: 100vw;
 }
 
-nav {
+.container {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	max-width: 100%;
+	padding-top: 12px;
+}
+
+.page-content {
+	flex: 1;
+	min-height: calc(100vh - var(--top-nav-height) - var(--chat-collapsed-height));
+	padding-bottom: var(--chat-collapsed-height);
+	overflow: auto;
+}
+
+.top-nav {
 	background: #293239;
 	color: #fff;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
+	align-items: center;
 	padding: 0 24px;
-	height: 5vh;
+	height: var(--top-nav-height);
+}
+
+.nav-left-actions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
 }
 
 .nav-actions {
 	display: flex;
 	align-items: center;
 	gap: 12px;
+	margin-left: auto;
 }
 
 .nav-button,
 #loginButton {
 	background: #1b2126;
-	border: 0;
-	border-radius: 3px;
+	border: wheat 1px solid;
+	border-radius: 30px;
 	color: #fff;
 	cursor: pointer;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	padding: 8px 14px;
+}
+
+.nav-icon-button {
+	background: #293239;
+	padding: 6px;
+	width: 34px;
+	height: 34px;
+}
+
+.maximize-icon {
+	display: block;
+	width: 16px;
+	height: 16px;
+	border: 2px solid #fff;
+	border-radius: 2px;
+}
+
+.new-window-icon {
+	position: relative;
+	display: block;
+	width: 16px;
+	height: 16px;
+	border: 2px solid #fff;
+	border-radius: 2px;
+}
+
+.new-window-icon::before {
+	content: "";
+	position: absolute;
+	top: -5px;
+	right: -5px;
+	width: 7px;
+	height: 7px;
+	border-top: 2px solid #fff;
+	border-right: 2px solid #fff;
+}
+
+.new-window-icon::after {
+	content: "";
+	position: absolute;
+	top: -1px;
+	right: -1px;
+	width: 8px;
+	height: 2px;
+	background: #fff;
+	transform: rotate(-45deg);
+	transform-origin: right center;
 }
 
 a { text-decoration: none; }
@@ -86,7 +161,7 @@ input {
 
 p { margin: 0; }
 
-.clearfix { *zoom: 1; } /* For IE 6/7 */
+.clearfix { zoom: 1; }
 .clearfix:before, .clearfix:after {
     content: "";
     display: table;

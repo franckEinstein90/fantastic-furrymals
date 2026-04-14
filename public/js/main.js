@@ -45,6 +45,26 @@ $(document).ready(() => {
     currentUserId = data.user_id;
   });
 
+  $('#maximize-window').on('click', async () => {
+    try {
+      if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen();
+      } else {
+        await document.exitFullscreen();
+      }
+    } catch (error) {
+      console.error('Unable to toggle fullscreen mode', error);
+    }
+  });
+
+  $('#open-home-window').on('click', () => {
+    window.open(
+      '/',
+      'furrymalsHomeWindow',
+      'width=960,height=700,left=120,top=80,menubar=yes,toolbar=yes,location=yes,status=yes,resizable=yes,scrollbars=yes'
+    );
+  });
+
   $('#live-chat header').on('click', () => {
     $('.chat').slideToggle(300, 'swing');
   });
