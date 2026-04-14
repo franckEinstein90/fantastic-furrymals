@@ -1,1 +1,74 @@
+<h1 class="mb-3">Session Event Graph</h1>
+<p class="text-muted">Use scroll to zoom, double-click an event to edit, and right-click an event to delete.</p>
 
+<div id="events-canvas" class="border rounded bg-dark-subtle mb-3"></div>
+
+<div class="card">
+  <div class="card-header">Active session events</div>
+  <div class="card-body">
+    <ul id="event-list" class="mb-0"></ul>
+  </div>
+</div>
+
+<div class="modal fade" id="eventDetailModal" tabindex="-1" aria-labelledby="eventDetailLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="eventDetailLabel">Event details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="event-form">
+        <div class="modal-body row g-3">
+          <div class="col-md-6">
+            <label class="form-label" for="event_id">Event ID</label>
+            <input class="form-control" id="event_id" readonly>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="status">Status</label>
+            <input class="form-control" id="status" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="title">Title</label>
+            <input class="form-control" id="title" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="severity">Severity</label>
+            <input class="form-control" id="severity" required>
+          </div>
+          <div class="col-12">
+            <label class="form-label" for="summary">Summary</label>
+            <input class="form-control" id="summary" required>
+          </div>
+          <div class="col-12">
+            <label class="form-label" for="description">Description</label>
+            <textarea class="form-control" id="description" rows="3" required></textarea>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="first_seen">First seen</label>
+            <input type="datetime-local" class="form-control" id="first_seen" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="last_seen">Last seen</label>
+            <input type="datetime-local" class="form-control" id="last_seen" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="created_at">Created at</label>
+            <input class="form-control" id="created_at" readonly>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="updated_at">Updated at</label>
+            <input class="form-control" id="updated_at" readonly>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script defer src="https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.min.js"></script>
+<script defer src="/js/session.js"></script>
+<script defer src="/js/home-events.js"></script>
