@@ -1,41 +1,48 @@
 <section class="my-3">
-  <h1 class="h3 mb-2">Molecule Viewer</h1>
-  <p class="text-muted mb-3">Interactive three.js molecule demo embedded on the home page.</p>
 
-  <div id="molecule-scene-wrapper" class="position-relative rounded overflow-hidden border border-secondary-subtle">
-    <div id="molecule-scene-container"></div>
-    <div id="molecule-scene-info" class="small px-2 py-1">
-      <a href="https://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - molecules
+  <div id="events-controls-toolbar" aria-label="Scene controls">
+    <div class="toolbar-row">
+      <button id="reset-view-btn" class="scene-control-btn" type="button" aria-label="Reset view" title="Reset view">&#8635;</button>
+    </div>
+    <div class="toolbar-row">
+      <button id="fork-window-btn" class="scene-control-btn" type="button" aria-label="Duplicate window" title="Open duplicate window">&#10697;</button>
     </div>
   </div>
+
+  <div id="events-scene-wrapper" class="position-relative rounded border border-secondary-subtle">
+    <div id="events-scene-container"></div>
+    <div id="events-tooltip"></div>
+    <div id="events-resize-handle"></div>
+  </div>
+
+  <div id="events-stats"></div>
+
 </section>
 
-<style>
-  #molecule-scene-wrapper {
-    min-height: 70vh;
-    background: #050505;
-  }
-
-  #molecule-scene-container {
-    width: 100%;
-    height: 70vh;
-  }
-
-  #molecule-scene-info {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 2;
-    color: #fff;
-    background: rgba(0, 0, 0, 0.3);
-  }
-
-  #molecule-scene-wrapper .label {
-    text-shadow: -1px 1px 1px rgb(0, 0, 0);
-    margin-left: 25px;
-    font-size: 20px;
-  }
-</style>
+<!-- Event detail dialog -->
+<div class="modal fade" id="event-dialog" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content" style="background:#12191f;color:#e8e8e8;border:1px solid rgba(255,255,255,0.15)">
+      <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,0.10)">
+        <span id="event-dialog-dot" style="width:14px;height:14px;border-radius:50%;display:inline-block;margin-right:10px;flex-shrink:0"></span>
+        <h5 class="modal-title" id="event-dialog-title"></h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body d-flex flex-column" style="gap:14px">
+        <div id="event-dialog-meta"></div>
+        <hr style="border-color:rgba(255,255,255,0.1);margin:0">
+        <div style="font-size:0.75rem;color:#aaa;text-transform:uppercase;letter-spacing:0.06em">Discussion</div>
+        <div id="event-dialog-chat-history" style="min-height:180px;max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:2px"></div>
+        <form id="event-dialog-form" autocomplete="off" style="display:flex;gap:8px;align-items:flex-end">
+          <textarea id="event-dialog-message" rows="2" placeholder="Type a message..."
+            autocomplete="off" autocorrect="off" autocapitalize="off"
+            style="flex:1;resize:none;background:#1e2d38;color:#e8e8e8;border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:8px 12px;font-size:14px"></textarea>
+          <button type="submit" style="padding:8px 18px;background:#2d6a9f;color:#fff;border:none;border-radius:6px;cursor:pointer;white-space:nowrap">Send</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script type="importmap">
   {
@@ -48,193 +55,393 @@
 
 <script type="module">
   import * as THREE from 'three';
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-  import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
-  import { PDBLoader } from 'three/addons/loaders/PDBLoader.js';
-  import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
-  import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
-  const sceneContainer = document.getElementById('molecule-scene-container');
-
-  if (sceneContainer) {
-    let camera;
-    let scene;
-    let renderer;
-    let labelRenderer;
-    let controls;
-    let root;
-
-    const MOLECULES = {
-      Ethanol: 'ethanol.pdb',
-      Aspirin: 'aspirin.pdb',
-      Caffeine: 'caffeine.pdb',
-      Nicotine: 'nicotine.pdb',
-      LSD: 'lsd.pdb',
-      Cocaine: 'cocaine.pdb',
-      Cholesterol: 'cholesterol.pdb',
-      Lycopene: 'lycopene.pdb',
-      Glucose: 'glucose.pdb',
-      'Aluminium oxide': 'Al2O3.pdb',
-      Cubane: 'cubane.pdb',
-      Copper: 'cu.pdb',
-      Fluorite: 'caf2.pdb',
-      Salt: 'nacl.pdb',
-      'YBCO superconductor': 'ybco.pdb',
-      Buckyball: 'buckyball.pdb',
-      Graphite: 'graphite.pdb'
-    };
-
-    const params = { molecule: 'caffeine.pdb' };
-    const loader = new PDBLoader();
-    const offset = new THREE.Vector3();
-
-    init();
-
-    function init() {
-      scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x050505);
-
-      const { clientWidth, clientHeight } = sceneContainer;
-      camera = new THREE.PerspectiveCamera(70, clientWidth / clientHeight, 1, 5000);
-      camera.position.z = 1000;
-      scene.add(camera);
-
-      const light1 = new THREE.DirectionalLight(0xffffff, 2.5);
-      light1.position.set(1, 1, 1);
-      scene.add(light1);
-
-      const light2 = new THREE.DirectionalLight(0xffffff, 1.5);
-      light2.position.set(-1, -1, 1);
-      scene.add(light2);
-
-      root = new THREE.Group();
-      scene.add(root);
-
-      renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.setSize(clientWidth, clientHeight);
-      renderer.setAnimationLoop(animate);
-      sceneContainer.appendChild(renderer.domElement);
-
-      labelRenderer = new CSS2DRenderer();
-      labelRenderer.setSize(clientWidth, clientHeight);
-      labelRenderer.domElement.style.position = 'absolute';
-      labelRenderer.domElement.style.top = '0px';
-      labelRenderer.domElement.style.pointerEvents = 'none';
-      sceneContainer.appendChild(labelRenderer.domElement);
-
-      controls = new TrackballControls(camera, renderer.domElement);
-      controls.minDistance = 500;
-      controls.maxDistance = 2000;
-
-      loadMolecule(params.molecule);
-
-      window.addEventListener('resize', onWindowResize);
-
-      const gui = new GUI({ title: 'Molecules' });
-      gui.add(params, 'molecule', MOLECULES).onChange(loadMolecule);
-      gui.open();
+  // If this page was opened as a fork, restore the cloned events
+  const forkKey = new URLSearchParams(window.location.search).get('fork');
+  if (forkKey) {
+    const raw = localStorage.getItem(forkKey);
+    if (raw) {
+      try { window.AppSession.events = JSON.parse(raw); } catch (_) {}
+      localStorage.removeItem(forkKey);
     }
+  }
 
-    function loadMolecule(model) {
-      const url = `https://threejs.org/examples/models/pdb/${model}`;
+  const EVENTS          = window.AppSession.events;
+  const CATEGORY_COLORS = window.AppSession.categoryColors;
+  const SPREAD = 900;
 
-      while (root.children.length > 0) {
-        const object = root.children[0];
-        object.parent.remove(object);
+  const container = document.getElementById('events-scene-container');
+  const tooltip   = document.getElementById('events-tooltip');
+  const statsEl   = document.getElementById('events-stats');
+
+  const hexToCss = (hex) => '#' + hex.toString(16).padStart(6, '0');
+
+  function renderStats() {
+    const total  = EVENTS.length;
+    const counts = {};
+    EVENTS.forEach((ev) => { counts[ev.category] = (counts[ev.category] ?? 0) + 1; });
+    const maxCount = Math.max(1, ...Object.values(counts));
+
+    const categoriesHtml = Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([cat, count]) => {
+        const color = hexToCss(CATEGORY_COLORS[cat] ?? 0xaaaaaa);
+        const pct   = Math.round((count / maxCount) * 100);
+        return `<div class="stat-category">
+          <span class="cat-dot" style="background:${color}"></span>
+          <span class="cat-name">${cat}</span>
+          <div class="cat-bar-wrap"><div class="cat-bar" style="width:${pct}%;background:${color}"></div></div>
+          <span class="cat-count">${count}</span>
+        </div>`;
+      }).join('');
+
+    statsEl.innerHTML =
+      `<div class="stat-total">
+        <div class="stat-number">${total}</div>
+        <div class="stat-label">Event${total === 1 ? '' : 's'}</div>
+      </div>
+      <div class="stat-categories">${categoriesHtml}</div>`;
+  }
+
+  if (container) {
+    const { clientWidth: W, clientHeight: H } = container;
+
+    // Scene
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x050505);
+//    scene.fog = new THREE.FogExp2(0x050505, 0.00045);
+
+    // Camera
+    const camera = new THREE.PerspectiveCamera(60, W / H, 1, 10000);
+    const initialCameraPosition = new THREE.Vector3(0, 1000, 1800);
+    const initialTarget = new THREE.Vector3(0, 0, 0);
+    const initialWrapperWidth = '80%';
+    camera.position.copy(initialCameraPosition);
+
+    // Lights
+    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+    const sun = new THREE.DirectionalLight(0xffffff, 1.5);
+    sun.position.set(1, 1, 1);
+    scene.add(sun);
+    const fill = new THREE.DirectionalLight(0xffffff, 0.8);
+    fill.position.set(-1, -1, -1);
+    scene.add(fill);
+
+    // Renderer
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(W, H);
+    renderer.setAnimationLoop(animate);
+    container.appendChild(renderer.domElement);
+
+    // Controls: lock vertical angle so drag rotates only around world Y axis
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.target.set(0, 0, 0);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.rotateSpeed = 1.2;
+    controls.zoomSpeed = 1.2;
+    controls.zoomToCursor = true;
+    controls.minDistance = 400;
+    controls.maxDistance = 4000;
+    controls.minPolarAngle = Math.PI / 2;
+    controls.maxPolarAngle = Math.PI / 2;
+    controls.update();
+
+    // Build event spheres
+    const sphereGeo = new THREE.IcosahedronGeometry(1, 3);
+    const eventMeshes = [];
+
+    EVENTS.forEach((ev) => {
+      const radius = 8 + ev.magnitude * 4;   // bigger = higher magnitude
+      const mat = new THREE.MeshPhongMaterial({
+        color: CATEGORY_COLORS[ev.category] ?? 0xffffff,
+        shininess: 80,
+        transparent: true,
+        opacity: 0.88,
+      });
+      const mesh = new THREE.Mesh(sphereGeo, mat);
+      mesh.scale.setScalar(radius);
+
+      // Random position in a sphere-ish volume
+      const theta = Math.random() * Math.PI * 2;
+      const phi   = Math.acos(2 * Math.random() - 1);
+      const r     = SPREAD * (0.3 + Math.random() * 0.7);
+      mesh.position.set(
+        r * Math.sin(phi) * Math.cos(theta),
+        r * Math.sin(phi) * Math.sin(theta),
+        r * Math.cos(phi)
+      );
+
+      // Slow personal drift velocity
+      mesh.userData.velocity = new THREE.Vector3(
+        (Math.random() - 0.5) * 0.4,
+        (Math.random() - 0.5) * 0.4,
+        (Math.random() - 0.5) * 0.4
+      );
+      mesh.userData.event = ev;
+
+      scene.add(mesh);
+      eventMeshes.push(mesh);
+    });
+
+    // Raycaster for hover
+    const raycaster = new THREE.Raycaster();
+    const pointer   = new THREE.Vector2();
+    let   hoveredMesh = null;
+
+    renderer.domElement.addEventListener('pointermove', (e) => {
+      const rect = renderer.domElement.getBoundingClientRect();
+      pointer.x =  ((e.clientX - rect.left)  / rect.width)  * 2 - 1;
+      pointer.y = -((e.clientY - rect.top)   / rect.height) * 2 + 1;
+    });
+
+    // Right-click to delete
+    renderer.domElement.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      raycaster.setFromCamera(pointer, camera);
+      const hits = raycaster.intersectObjects(eventMeshes);
+      if (hits.length === 0) return;
+
+      const mesh = hits[0].object;
+      const ev   = mesh.userData.event;
+
+      scene.remove(mesh);
+      mesh.geometry.dispose();
+      mesh.material.dispose();
+      eventMeshes.splice(eventMeshes.indexOf(mesh), 1);
+
+      const idx = window.AppSession.events.indexOf(ev);
+      if (idx !== -1) window.AppSession.events.splice(idx, 1);
+
+      if (hoveredMesh === mesh) {
+        hoveredMesh = null;
+        tooltip.style.display = 'none';
       }
 
-      loader.load(url, (pdb) => {
-        const geometryAtoms = pdb.geometryAtoms;
-        const geometryBonds = pdb.geometryBonds;
-        const json = pdb.json;
+      renderStats();
+    });
 
-        const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
-        const sphereGeometry = new THREE.IcosahedronGeometry(1, 3);
+    // Double-click to open event detail dialog
+    let dialogEvent = null;
+    let eventModal  = null;
 
-        geometryAtoms.computeBoundingBox();
-        geometryAtoms.boundingBox.getCenter(offset).negate();
+    const appendDialogMessage = (msg) => {
+      const hist = document.getElementById('event-dialog-chat-history');
+      if (!hist) return;
+      const wrap     = document.createElement('div');
+      wrap.className = 'event-chat-msg';
+      const userSpan = document.createElement('span');
+      userSpan.className   = 'event-chat-user';
+      userSpan.textContent = msg.userId.slice(0, 8);
+      const textSpan = document.createElement('span');
+      textSpan.className   = 'event-chat-text';
+      textSpan.textContent = msg.text;
+      wrap.append(userSpan, document.createTextNode(' '), textSpan);
+      hist.appendChild(wrap);
+      hist.scrollTop = hist.scrollHeight;
+    };
 
-        geometryAtoms.translate(offset.x, offset.y, offset.z);
-        geometryBonds.translate(offset.x, offset.y, offset.z);
+    // Double-click detection (manual timer — TrackballControls can suppress native dblclick)
+    let lastClickTime = 0;
+    let lastClickMesh = null;
 
-        let positions = geometryAtoms.getAttribute('position');
-        const colors = geometryAtoms.getAttribute('color');
+    renderer.domElement.addEventListener('click', () => {
+      const now = Date.now();
+      raycaster.setFromCamera(pointer, camera);
+      const hits = raycaster.intersectObjects(eventMeshes);
+      const hitMesh = hits.length > 0 ? hits[0].object : null;
 
-        const position = new THREE.Vector3();
-        const color = new THREE.Color();
+      if (now - lastClickTime < 300 && hitMesh && hitMesh === lastClickMesh) {
+        // Second click within 300 ms on the same mesh → open dialog
+        openEventDialog(hitMesh.userData.event);
+        lastClickTime = 0;
+        lastClickMesh = null;
+      } else {
+        lastClickTime = now;
+        lastClickMesh = hitMesh;
+      }
+    });
 
-        for (let i = 0; i < positions.count; i += 1) {
-          position.x = positions.getX(i);
-          position.y = positions.getY(i);
-          position.z = positions.getZ(i);
+    renderer.domElement.addEventListener('dblclick', () => {
+      // Belt-and-suspenders: also handle native dblclick when available
+      raycaster.setFromCamera(pointer, camera);
+      const hits = raycaster.intersectObjects(eventMeshes);
+      if (hits.length === 0) return;
+      openEventDialog(hits[0].object.userData.event);
+      lastClickTime = 0;
+      lastClickMesh = null;
+    });
 
-          color.r = colors.getX(i);
-          color.g = colors.getY(i);
-          color.b = colors.getZ(i);
+    function openEventDialog(ev) {
+      const color = hexToCss(CATEGORY_COLORS[ev.category] ?? 0xaaaaaa);
+      document.getElementById('event-dialog-title').textContent = ev.label;
+      document.getElementById('event-dialog-dot').style.background = color;
+      document.getElementById('event-dialog-meta').innerHTML =
+        `<span class="badge" style="background:${color};color:#000;text-transform:capitalize">${ev.category}</span>` +
+        `<span class="ms-2 text-secondary">Magnitude:</span> <strong>${ev.magnitude} / 10</strong>`;
+      const hist = document.getElementById('event-dialog-chat-history');
+      hist.innerHTML = '';
+      dialogEvent = ev.label;
+      (window.AppSession.eventChats?.[ev.label] ?? []).forEach(appendDialogMessage);
+      if (!eventModal) {
+        eventModal = new window.bootstrap.Modal(document.getElementById('event-dialog'));
+      }
+      eventModal.show();
+    }
 
-          const material = new THREE.MeshPhongMaterial({ color });
-          const object = new THREE.Mesh(sphereGeometry, material);
-          object.position.copy(position);
-          object.position.multiplyScalar(75);
-          object.scale.multiplyScalar(25);
-          root.add(object);
+    window.addEventListener('app:event_chat', (e) => {
+      const msg = e.detail;
+      if (!window.AppSession.eventChats) window.AppSession.eventChats = {};
+      if (!window.AppSession.eventChats[msg.eventLabel]) {
+        window.AppSession.eventChats[msg.eventLabel] = [];
+      }
+      window.AppSession.eventChats[msg.eventLabel].push(msg);
+      if (dialogEvent === msg.eventLabel) appendDialogMessage(msg);
+    });
 
-          const atom = json.atoms[i];
-          const text = document.createElement('div');
-          text.className = 'label';
-          text.style.color = `rgb(${atom[3][0]},${atom[3][1]},${atom[3][2]})`;
-          text.textContent = atom[4];
-
-          const label = new CSS2DObject(text);
-          label.position.copy(object.position);
-          root.add(label);
-        }
-
-        positions = geometryBonds.getAttribute('position');
-
-        const start = new THREE.Vector3();
-        const end = new THREE.Vector3();
-
-        for (let i = 0; i < positions.count; i += 2) {
-          start.x = positions.getX(i);
-          start.y = positions.getY(i);
-          start.z = positions.getZ(i);
-
-          end.x = positions.getX(i + 1);
-          end.y = positions.getY(i + 1);
-          end.z = positions.getZ(i + 1);
-
-          start.multiplyScalar(75);
-          end.multiplyScalar(75);
-
-          const object = new THREE.Mesh(boxGeometry, new THREE.MeshPhongMaterial({ color: 0xffffff }));
-          object.position.copy(start);
-          object.position.lerp(end, 0.5);
-          object.scale.set(5, 5, start.distanceTo(end));
-          object.lookAt(end);
-          root.add(object);
-        }
+    const dialogForm = document.getElementById('event-dialog-form');
+    if (dialogForm) {
+      dialogForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const input = document.getElementById('event-dialog-message');
+        const text  = input.value.trim();
+        if (!text || !dialogEvent) return;
+        const sock = window.AppSession.socket;
+        if (sock) sock.emit('event_chat', { eventLabel: dialogEvent, text });
+        input.value = '';
       });
     }
 
-    function onWindowResize() {
-      const { clientWidth, clientHeight } = sceneContainer;
-      camera.aspect = clientWidth / clientHeight;
+    renderStats();
+
+    // Right-edge drag to resize the scene wrapper
+    const wrapper     = document.getElementById('events-scene-wrapper');
+    const resizeHandle = document.getElementById('events-resize-handle');
+    const resetViewButton = document.getElementById('reset-view-btn');
+
+    const applyViewportResize = () => {
+      const { clientWidth: nW, clientHeight: nH } = container;
+      camera.aspect = nW / nH;
       camera.updateProjectionMatrix();
-      renderer.setSize(clientWidth, clientHeight);
-      labelRenderer.setSize(clientWidth, clientHeight);
+      renderer.setSize(nW, nH);
+    };
+
+    if (resetViewButton) {
+      resetViewButton.addEventListener('click', () => {
+        camera.position.copy(initialCameraPosition);
+        controls.target.copy(initialTarget);
+        wrapper.style.width = initialWrapperWidth;
+        controls.update();
+        applyViewportResize();
+      });
     }
 
+    // --- Fork (duplicate) window ---
+    const forkWindowBtn = document.getElementById('fork-window-btn');
+    if (forkWindowBtn) {
+      forkWindowBtn.addEventListener('click', () => {
+        const key = 'ff_fork_' + Date.now();
+        localStorage.setItem(key, JSON.stringify(window.AppSession.events));
+        window.open('/?fork=' + encodeURIComponent(key), '_blank');
+      });
+    }
+
+    // --- Draggable toolbar ---
+    const toolbar = document.getElementById('events-controls-toolbar');
+    if (toolbar) {
+      let dragOffsetX = 0, dragOffsetY = 0, isDraggingToolbar = false;
+
+      toolbar.addEventListener('pointerdown', (e) => {
+        if (e.target !== toolbar) return; // only drag from the toolbar background, not buttons
+        isDraggingToolbar = true;
+        const rect = toolbar.getBoundingClientRect();
+        dragOffsetX = e.clientX - rect.left;
+        dragOffsetY = e.clientY - rect.top;
+        toolbar.setPointerCapture(e.pointerId);
+        toolbar.style.cursor = 'grabbing';
+        e.preventDefault();
+      });
+
+      toolbar.addEventListener('pointermove', (e) => {
+        if (!isDraggingToolbar) return;
+        toolbar.style.left = (e.clientX - dragOffsetX) + 'px';
+        toolbar.style.top  = (e.clientY - dragOffsetY) + 'px';
+        toolbar.style.right = 'auto';
+      });
+
+      toolbar.addEventListener('pointerup', () => {
+        isDraggingToolbar = false;
+        toolbar.style.cursor = 'grab';
+      });
+    }
+
+    let isResizing = false;
+
+    resizeHandle.addEventListener('pointerdown', (e) => {
+      isResizing = true;
+      resizeHandle.classList.add('dragging');
+      resizeHandle.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+
+    resizeHandle.addEventListener('pointermove', (e) => {
+      if (!isResizing) return;
+      const rect    = wrapper.getBoundingClientRect();
+      const newWidth = e.clientX - rect.left;
+      const minWidth = 240;
+      const maxWidth = window.innerWidth - rect.left - 16;
+      wrapper.style.width = Math.min(maxWidth, Math.max(minWidth, newWidth)) + 'px';
+      // Notify Three.js of the size change
+      applyViewportResize();
+    });
+
+    resizeHandle.addEventListener('pointerup', () => {
+      isResizing = false;
+      resizeHandle.classList.remove('dragging');
+    });
+
+    // Resize
+    window.addEventListener('resize', () => {
+      applyViewportResize();
+    });
+
     function animate() {
+      // Drift each sphere and keep inside the bounding sphere
+      eventMeshes.forEach((mesh) => {
+        mesh.position.addScaledVector(mesh.userData.velocity, 1);
+        if (mesh.position.length() > SPREAD) {
+          mesh.userData.velocity.negate();
+        }
+      });
+
+      // Hover detection
+      raycaster.setFromCamera(pointer, camera);
+      const hits = raycaster.intersectObjects(eventMeshes);
+      if (hits.length > 0) {
+        const hit = hits[0].object;
+        if (hit !== hoveredMesh) {
+          if (hoveredMesh) hoveredMesh.material.emissive.setHex(0x000000);
+          hoveredMesh = hit;
+          hoveredMesh.material.emissive.setHex(0x444444);
+        }
+        const ev = hit.userData.event;
+        tooltip.style.display = 'block';
+        tooltip.innerHTML =
+          `<strong>${ev.label}</strong><br>` +
+          `Category: ${ev.category}<br>` +
+          `Magnitude: ${ev.magnitude}/10`;
+      } else {
+        if (hoveredMesh) {
+          hoveredMesh.material.emissive.setHex(0x000000);
+          hoveredMesh = null;
+        }
+        tooltip.style.display = 'none';
+      }
+
       controls.update();
-
-      const time = Date.now() * 0.0004;
-      root.rotation.x = time;
-      root.rotation.y = time * 0.7;
-
       renderer.render(scene, camera);
-      labelRenderer.render(scene, camera);
     }
   }
 </script>

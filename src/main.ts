@@ -29,6 +29,13 @@ interface WindowCountMessage {
   count: number;
 }
 
+interface EventChatMessage {
+  text: string;
+  userId: string;
+  eventLabel: string;
+  timestamp: string;
+}
+
 interface FurryMalsApp {
   io: SocketIOServer;
 }
@@ -62,6 +69,22 @@ const main = async (): Promise<void> => {
       };
 
       io.emit('chat message', message);
+    });
+
+    socket.on('event_chat', ({ eventLabel, text }: { eventLabel: string; text: string }): void => {
+      const cleanedText = text.trim();
+      if (!cleanedText || !eventLabel) {
+        return;
+      }
+
+      const message: EventChatMessage = {
+        text: cleanedText,
+        userId,
+        eventLabel,
+        timestamp: new Date().toISOString(),
+      };
+
+      io.emit('event_chat', message);
     });
 
     socket.on('disconnect', (): void => {

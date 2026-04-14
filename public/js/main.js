@@ -1,5 +1,6 @@
 $(document).ready(() => {
   const socket = io();
+  window.AppSession.socket = socket;
   let currentUserId = null;
   const renderWindowCount = (count) => {
     const suffix = count === 1 ? '' : 's';
@@ -57,6 +58,10 @@ $(document).ready(() => {
     }
   });
 
+  socket.on('event_chat', (message) => {
+    window.dispatchEvent(new CustomEvent('app:event_chat', { detail: message }));
+  });
+
   $('#maximize-window').on('click', async () => {
     try {
       if (!document.fullscreenElement) {
@@ -86,7 +91,22 @@ $(document).ready(() => {
   });
 
   $('#close-window').on('click', () => {
-    window.close();
+    // Browsers often only allow closing script-opened windows.
+    // Try the normal path first, then a broader self-targeted fallback.
+    try {
+      window.close();
+    } catch (error) {
+      console.error('Unable to close window directly', error);
+    }
+
+    if (!window.closed) {
+      try {
+        window.open('', '_self');
+        window.close();
+      } catch (error) {
+        console.error('Unable to close window with fallback strategy', error);
+      }
+    }
   });
 
   $('#chat-history-toggle').on('click', () => {

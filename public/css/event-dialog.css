@@ -1,0 +1,19 @@
+.event-chat-msg {
+  padding: 4px 0;
+  font-size: 13px;
+  line-height: 1.5;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.event-chat-user {
+  font-weight: 600;
+  color: #7abfff;
+  margin-right: 6px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.event-chat-text {
+  color: #ddd;
+}

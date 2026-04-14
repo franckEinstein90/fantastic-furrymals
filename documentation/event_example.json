@@ -1,0 +1,114 @@
+{
+  "event_id": "evt_2026_000123",
+  "title": "Active exploitation of CVE-2026-12345 affecting edge appliances",
+  "summary": "Threat actors are actively exploiting CVE-2026-12345 in internet-facing edge appliances to gain initial access and deploy web shells. Activity has been observed across multiple sectors, with follow-on credential theft and lateral movement.",
+  "description": "This event represents a cluster of reporting and technical indicators related to active exploitation of CVE-2026-12345. Public advisories, threat exchange entries, and vendor research indicate ongoing compromise attempts against exposed devices. The event includes references to observed exploitation, related infrastructure, and mapped MITRE ATT&CK techniques.",
+  "status": "active",
+  "severity": "high",
+  "confidence": 0.82,
+  "first_seen": "2026-04-10T14:22:00Z",
+  "last_seen": "2026-04-14T19:05:00Z",
+  "created_at": "2026-04-14T19:10:00Z",
+  "updated_at": "2026-04-14T19:10:00Z",
+  "source_types": [
+    "public_advisory",
+    "threat_exchange",
+    "vendor_report"
+  ],
+  "source_refs": [
+    {
+      "source_name": "CISA KEV",
+      "source_id": "CVE-2026-12345",
+      "url": "https://example.org/cisa/kev/cve-2026-12345",
+      "retrieved_at": "2026-04-14T18:40:00Z"
+    },
+    {
+      "source_name": "OTX",
+      "source_id": "pulse_abcdef",
+      "url": "https://example.org/otx/pulse/abcdef",
+      "retrieved_at": "2026-04-14T18:41:00Z"
+    }
+  ],
+  "actors": [
+    {
+      "name": "UNCXXXX",
+      "type": "threat_actor",
+      "confidence": 0.45,
+      "aliases": ["Possible Group Alias"],
+      "attribution_basis": "Mentioned in one vendor report; not yet corroborated across multiple sources"
+    }
+  ],
+  "malware_families": [
+    {
+      "name": "ExampleShell",
+      "confidence": 0.71
+    }
+  ],
+  "ttps": [
+    {
+      "attack_id": "T1190",
+      "name": "Exploit Public-Facing Application",
+      "tactic": "Initial Access",
+      "confidence": 0.92
+    },
+    {
+      "attack_id": "T1505.003",
+      "name": "Web Shell",
+      "tactic": "Persistence",
+      "confidence": 0.84
+    }
+  ],
+  "vulnerabilities": [
+    {
+      "cve": "CVE-2026-12345",
+      "cvss": 9.8,
+      "kev_listed": true,
+      "exploitation_status": "active"
+    }
+  ],
+  "indicators": {
+    "ips": ["198.51.100.10"],
+    "domains": ["malicious-example.com"],
+    "urls": ["https://malicious-example.com/payload"],
+    "hashes": ["0123456789abcdef0123456789abcdef"]
+  },
+  "targets": [
+    {
+      "sector": "Government",
+      "region": "North America",
+      "confidence": 0.63
+    },
+    {
+      "sector": "Telecommunications",
+      "region": "Europe",
+      "confidence": 0.41
+    }
+  ],
+  "timeline": [
+    {
+      "timestamp": "2026-04-10T14:22:00Z",
+      "type": "advisory",
+      "text": "Initial public advisory published regarding active exploitation."
+    },
+    {
+      "timestamp": "2026-04-12T08:05:00Z",
+      "type": "report",
+      "text": "Vendor research linked exploitation to observed web shell deployment."
+    }
+  ],
+  "analytic_labels": [
+    "active_exploitation",
+    "internet_facing",
+    "credential_theft",
+    "edge_device"
+  ],
+  "related_events": [
+    "evt_2026_000119"
+  ],
+  "raw_documents": [
+    {
+      "doc_id": "doc_001",
+      "chunk_ids": ["chunk_001", "chunk_002"]
+    }
+  ]
+}
