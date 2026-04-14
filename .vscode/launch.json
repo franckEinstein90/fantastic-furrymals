@@ -8,9 +8,11 @@
             "type": "node",
             "request": "launch",
             "name": "Start Server",
-            "runtimeArgs": ["-r", "ts-node/register"],
-            "args": ["${workspaceFolder}/src/main.ts"], // Replace with your main TypeScript file
-            "console": "integratedTerminal"
+          "runtimeExecutable": "npm",
+          "runtimeArgs": ["run", "dev"],
+          "restart": true,
+          "console": "integratedTerminal",
+          "internalConsoleOptions": "neverOpen"
         },
         {
             "type": "node",

@@ -13,14 +13,14 @@ export const appFactory = async (logger: winston.Logger): Promise<FurryMallsApp>
   const port = process.env.PORT || 3000;
   /********************************************************/
   app.engine('handlebars', engine());
-  /*app.engine('hbs', engine({
-    extname: 'handlebars',
-    defaultLayout: 'main',
-    layoutsDir: path.join(__dirname, '../views/layouts'),
-    partialsDir: path.join(__dirname, '../views/partials')
-  }));*/
-  app.set('view engine', 'handlebars');
-  app.use(express.static('public'));
+    app.engine('hbs', engine({
+      extname: 'handlebars',
+      defaultLayout: 'main',
+      layoutsDir: path.join(__dirname, '../views/layouts'),
+      partialsDir: path.join(__dirname, '../views/partials')
+    }));
+    app.set('view engine', 'handlebars');
+    app.use(express.static('public'));
   /********************************************************/
 
   app.get('/', (req, res) => {

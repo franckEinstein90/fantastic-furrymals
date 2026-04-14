@@ -1,5 +1,14 @@
 const charBuffer = [];
 
+const KEYCODES = {
+	BACKSPACE: 8,
+	SPACE: 32,
+	DIGIT_0: 48,
+	TILDE: 126,
+	SEMICOLON: 186,
+	FORWARD_SLASH: 191,
+};
+
 $(document).ready(() =>{
 
 	/*************************************************************************/
@@ -26,9 +35,10 @@ $(document).ready(() =>{
 
 	$("#message").keydown((event) => {
 		event.preventDefault();
-		if(	event.keyCode === 32 
-			|| (event.keyCode >= 48 && event.keyCode <= 126) || (event.keyCode >=186 && event.keyCode <=191)
-			|| event.keyCode ==8)
+		if(	event.keyCode === KEYCODES.SPACE 
+			|| (event.keyCode >= KEYCODES.DIGIT_0 && event.keyCode <= KEYCODES.TILDE)
+			|| (event.keyCode >= KEYCODES.SEMICOLON && event.keyCode <= KEYCODES.FORWARD_SLASH)
+			|| event.keyCode === KEYCODES.BACKSPACE)
 			{
 			process_keycode(event);		
 		}
