@@ -185,3 +185,15 @@ p { margin: 0; }
 	font-style: italic;	
 	margin: 0 0 0 80px;
 }
+#send-message {
+	margin-left: 8px;
+	padding: 8px 14px;
+	cursor: pointer;
+	background: #293239;
+	color: #fff;
+	border-radius: 3px;
+}
+
+#user-status {
+	align-self: center;
+}

@@ -1,10 +1,3 @@
-/******************************************************************************
- * The entry point for the llm-deliotte-chat-bot application. 
- * The appliation is a chat bot that is hosted on Azure and is accessible
- * through http or websocket connections. 
- * December 2023
-/******************************************************************************/
-// <----------------------------- 1. Load Environment Variables ---------------->
 import { appFactory } from './server/appFactory';
 import * as path from 'path';
 import {config} from 'dotenv';
@@ -17,22 +10,19 @@ const ENV_FILE_PATH = path.join(__dirname, '..', ENV_FILE_NAME);
 config({ path: ENV_FILE_PATH });
 
 const logger = winston.createLogger({
-    level: 'info',
-    format: winston.format.json(),
-    transports: [
-      new winston.transports.Console({
-        format: winston.format.simple(),
-      }),
-    ],
-  });
-
-interface UpdateMessage {
-  property: string;
-  value: string;
-}
+  level: 'info',
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.Console({
+      format: winston.format.simple(),
+    }),
+  ],
+});
 
 interface ChatMessage {
   text: string;
+  userId: string;
+  timestamp: string;
 }
 
 interface FurryMalsApp {
@@ -40,7 +30,6 @@ interface FurryMalsApp {
 }
 
 const main = async (): Promise<void> => {
-
   const furryMalsApp: FurryMalsApp = await appFactory(logger);
   const io: SocketIOServer = furryMalsApp.io;
 
@@ -48,29 +37,29 @@ const main = async (): Promise<void> => {
     const userId = randomUUID();
     socket.data.user_id = userId;
     socket.emit('user_id', { user_id: userId });
-    console.log(`user connected: ${userId}`);
+    logger.info(`user connected: ${userId}`);
 
-    io.emit('update', { property: "prop", value: "fdsa" } as UpdateMessage);
+    socket.on('chat message', (text: string): void => {
+      const cleanedText = text.trim();
+      if (!cleanedText) {
+        return;
+      }
 
-    socket.on('chat message', (msg: ChatMessage): void => {
-      console.log(msg);
-      io.emit('chat message', msg);
+      const message: ChatMessage = {
+        text: cleanedText,
+        userId,
+        timestamp: new Date().toISOString(),
+      };
+
+      socket.broadcast.emit('chat message', message);
     });
- 
+
     socket.on('disconnect', (): void => {
-      console.log(`user disconnected: ${socket.data.user_id}`);
+      logger.info(`user disconnected: ${socket.data.user_id}`);
     });
-  
-
-  })
-
+  });
 }
 
-
-
-
-main()
-.catch(e => {
-  console.log('error')
-})
-
+main().catch(() => {
+  logger.error('error starting application');
+});

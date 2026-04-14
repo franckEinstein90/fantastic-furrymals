@@ -1,65 +1,49 @@
-const charBuffer = [];
+$(document).ready(() => {
+  const socket = io();
 
-const KEYCODES = {
-	BACKSPACE: 8,
-	SPACE: 32,
-	DIGIT_0: 48,
-	TILDE: 126,
-	SEMICOLON: 186,
-	FORWARD_SLASH: 191,
-};
+  const appendMessage = (message) => {
+    const messageDate = new Date(message.timestamp);
+    const timeText = Number.isNaN(messageDate.getTime())
+      ? ''
+      : messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-$(document).ready(() =>{
+    $('#chat-history').append(`
+      <div class="chat-message clearfix">
+        <div class="chat-message-content">
+          <span class="chat-time">${timeText}</span>
+          <h5>${message.userId}</h5>
+          <p>${message.text}</p>
+        </div>
+      </div>
+      <hr>
+    `);
 
-	/*************************************************************************/
-	/* Web socket events *****************************************************/
-	const socket = io();
-	socket.on('update', function(data){
-		console.log("data")
-	});
+    const chatHistory = document.getElementById('chat-history');
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+  };
 
-	const updateUserMessages = ()=>{
-		const message = charBuffer.join('');
-		$("#message").val(charBuffer.join(''));
-		$("#title").html(charBuffer.join(''));
-	}
+  $('#chat-form').on('submit', (event) => {
+    event.preventDefault();
+    const text = $('#message').val().toString();
 
-	const process_keycode = (event)=>{
-		if (event.key === 'Backspace') { 
-			const lastChar = charBuffer.pop(); 
-		} else { 
-			charBuffer.push(event.key);
-		}
-		updateUserMessages();
-	}
+    if (!text.trim()) {
+      return;
+    }
 
-	$("#message").keydown((event) => {
-		event.preventDefault();
-		if(	event.keyCode === KEYCODES.SPACE 
-			|| (event.keyCode >= KEYCODES.DIGIT_0 && event.keyCode <= KEYCODES.TILDE)
-			|| (event.keyCode >= KEYCODES.SEMICOLON && event.keyCode <= KEYCODES.FORWARD_SLASH)
-			|| event.keyCode === KEYCODES.BACKSPACE)
-			{
-			process_keycode(event);		
-		}
+    socket.emit('chat message', text);
+    $('#message').val('');
+  });
 
-	});
+  socket.on('chat message', (message) => {
+    appendMessage(message);
+  });
 
-	$("#send-message").on('click', (event)=>{
-		event.preventDefault();
-		socket.emit('chat message', charBuffer.join(''));
-		charBuffer.length = 0;
-		updateUserMessages();
-	});
+  $('#live-chat header').on('click', () => {
+    $('.chat').slideToggle(300, 'swing');
+  });
 
-	$('#live-chat header').on('click', () =>{
-		$('.chat').slideToggle(300, 'swing');
-		$('.chat-message-counter').fadeToggle(300, 'swing');
-	});
-
-	$('.chat-close').on('click', (e) =>{
-		e.preventDefault();
-		$('#live-chat').fadeOut(300);
-	});
-
-}) 
+  $('.chat-close').on('click', (event) => {
+    event.preventDefault();
+    $('#live-chat').fadeOut(300);
+  });
+});

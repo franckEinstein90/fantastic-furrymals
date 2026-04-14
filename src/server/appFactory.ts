@@ -8,20 +8,18 @@ import winston from 'winston';
 
 export const appFactory = async (logger: winston.Logger): Promise<FurryMallsApp> => {
 
-  /********************************************************/
   const app: Express = express();
   const port = process.env.PORT || 3000;
-  /********************************************************/
-  app.engine('handlebars', engine());
-    app.engine('hbs', engine({
-      extname: 'handlebars',
-      defaultLayout: 'main',
-      layoutsDir: path.join(__dirname, '../views/layouts'),
-      partialsDir: path.join(__dirname, '../views/partials')
-    }));
-    app.set('view engine', 'handlebars');
-    app.use(express.static('public'));
-  /********************************************************/
+
+  app.engine('hbs', engine({
+    extname: 'handlebars',
+    defaultLayout: 'main',
+    layoutsDir: path.join(__dirname, '../views/layouts'),
+    partialsDir: path.join(__dirname, '../views/partials')
+  }));
+  app.set('view engine', 'hbs');
+  app.set('views', path.join(__dirname, '../views'));
+  app.use(express.static('public'));
 
   app.get('/', (req, res) => {
     res.render('home');
@@ -35,12 +33,13 @@ export const appFactory = async (logger: winston.Logger): Promise<FurryMallsApp>
   httpServer.listen(port, () => {
     logger.info(`Server running at http://localhost:${port}`);
   });
+
   const io = new SocketIOServer(httpServer);
 
   return {
     io,
-    app, 
-    httpServer, 
+    app,
+    httpServer,
 
     shutDown: async ()=>{
       io.close(()=>{
