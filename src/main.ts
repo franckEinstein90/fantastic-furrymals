@@ -51,7 +51,7 @@ const main = async (): Promise<void> => {
         timestamp: new Date().toISOString(),
       };
 
-      socket.broadcast.emit('chat message', message);
+      io.emit('chat message', message);
     });
 
     socket.on('disconnect', (): void => {

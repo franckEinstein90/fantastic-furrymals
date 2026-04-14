@@ -11,8 +11,10 @@
 <body>
   {{> topnav}}
     <div class="container">
-    {{{body}}}
-    {{> livechat}}
+        <div class="page-content">
+            {{{body}}}
+        </div>
+        {{> livechat}}
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
     <script src="/js/main.js"></script>
