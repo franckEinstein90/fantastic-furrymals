@@ -1,4 +1,5 @@
 import path from 'node:path'
+import fs from 'node:fs';
 import express, {Express} from 'express';
 import {createServer} from 'node:http';
 import {engine} from 'express-handlebars';
@@ -6,20 +7,41 @@ import {Server as SocketIOServer} from "socket.io";
 import {FurryMallsApp} from './types';
 import winston from 'winston';
 
-export const appFactory = async (logger: winston.Logger): Promise<FurryMallsApp> => {
+const resolveFirstExistingPath = (paths: string[]): string => {
+  for (const possiblePath of paths) {
+    if (fs.existsSync(possiblePath)) {
+      return possiblePath;
+    }
+  }
 
+  return paths[0];
+};
+
+export const appFactory = async (logger: winston.Logger): Promise<FurryMallsApp> => {
   const app: Express = express();
   const port = process.env.PORT || 3000;
 
-  app.engine('hbs', engine({
-    extname: 'handlebars',
+  const viewsDir = resolveFirstExistingPath([
+    path.join(process.cwd(), 'src/views'),
+    path.join(process.cwd(), 'dist/views'),
+    path.join(__dirname, '../views'),
+  ]);
+
+  const publicDir = resolveFirstExistingPath([
+    path.join(process.cwd(), 'public'),
+    path.join(__dirname, '../../public'),
+  ]);
+
+  app.engine('handlebars', engine({
+    extname: '.handlebars',
     defaultLayout: 'main',
-    layoutsDir: path.join(__dirname, '../views/layouts'),
-    partialsDir: path.join(__dirname, '../views/partials')
+    layoutsDir: path.join(viewsDir, 'layouts'),
+    partialsDir: path.join(viewsDir, 'partials')
   }));
-  app.set('view engine', 'hbs');
-  app.set('views', path.join(__dirname, '../views'));
-  app.use(express.static('public'));
+
+  app.set('view engine', 'handlebars');
+  app.set('views', viewsDir);
+  app.use(express.static(publicDir));
 
   app.get('/', (req, res) => {
     res.render('home');
