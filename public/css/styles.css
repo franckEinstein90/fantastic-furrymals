@@ -23,9 +23,28 @@ nav {
 	flex-direction: row;
 	justify-content: space-between;
 	padding: 0 24px;
-	height:5vh;
-
+	height: 5vh;
 }
+
+.nav-actions {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.nav-button,
+#loginButton {
+	background: #1b2126;
+	border: 0;
+	border-radius: 3px;
+	color: #fff;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 8px 14px;
+}
+
 a { text-decoration: none; }
 
 fieldset {
