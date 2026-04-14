@@ -178,6 +178,7 @@ p { margin: 0; }
 
 .chat-history {
 	height: 252px;
+	font-size: larger;
 	padding: 8px 24px;
 	overflow-y: scroll;
 }
