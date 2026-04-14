@@ -1,40 +1,47 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const $ = window.jQuery;
-  if (!$) {
-    return;
-  }
-  const eventList = $('#event-list');
   const canvasHost = document.getElementById('events-canvas');
   const modalElement = document.getElementById('eventDetailModal');
+  const eventList = document.getElementById('event-list');
+  const form = document.getElementById('event-form');
 
-  if (!canvasHost || !window.THREE || !Array.isArray(window.sessionEvents)) {
+  if (!canvasHost || !modalElement || !eventList || !form || !window.THREE || !Array.isArray(window.sessionEvents)) {
     return;
   }
 
   const formatDate = (date) => {
     const parsed = new Date(date);
-    if (Number.isNaN(parsed.getTime())) {
-      return '';
-    }
+    return Number.isNaN(parsed.getTime()) ? '' : parsed.toLocaleString();
+  };
 
-    return parsed.toLocaleString();
+  const setValue = (id, value) => {
+    const input = document.getElementById(id);
+    if (input) {
+      input.value = value;
+    }
+  };
+
+  const getValue = (id) => {
+    const input = document.getElementById(id);
+    return input ? input.value.toString() : '';
   };
 
   const renderEventList = () => {
-    eventList.empty();
+    eventList.innerHTML = '';
     window.sessionEvents.forEach((eventItem) => {
-      eventList.append(`<li><strong>${eventItem.event_id}</strong> — ${eventItem.title}</li>`);
+      const listItem = document.createElement('li');
+      listItem.innerHTML = `<strong>${eventItem.event_id}</strong> — ${eventItem.title}`;
+      eventList.appendChild(listItem);
     });
   };
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#0f172a');
 
-  const camera = new THREE.PerspectiveCamera(55, canvasHost.clientWidth / 420, 0.1, 1000);
+  const camera = new THREE.PerspectiveCamera(55, Math.max(canvasHost.clientWidth, 300) / 420, 0.1, 1000);
   camera.position.z = 13;
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(canvasHost.clientWidth, 420);
+  renderer.setSize(Math.max(canvasHost.clientWidth, 300), 420);
   canvasHost.appendChild(renderer.domElement);
 
   const ambient = new THREE.AmbientLight(0xffffff, 0.8);
@@ -64,8 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
         color: severityColor[eventItem.severity] ?? 0x3b82f6,
       });
       const mesh = new THREE.Mesh(geometry, material);
-      mesh.position.x = (idx - 1) * 3.4;
-      mesh.userData.eventId = eventItem.event_id;
+      mesh.position.x = (idx - (window.sessionEvents.length - 1) / 2) * 3.4;
       scene.add(mesh);
       eventMeshes.push({ mesh, eventItem });
     });
@@ -89,7 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     raycaster.setFromCamera(pointer, camera);
     const intersects = raycaster.intersectObjects(eventMeshes.map(({ mesh }) => mesh));
-
     if (!intersects.length) {
       return null;
     }
@@ -98,16 +103,16 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const fillFormFromEvent = (eventItem) => {
-    $('#event_id').val(eventItem.event_id);
-    $('#title').val(eventItem.title);
-    $('#summary').val(eventItem.summary);
-    $('#description').val(eventItem.description);
-    $('#status').val(eventItem.status);
-    $('#severity').val(eventItem.severity);
-    $('#first_seen').val(new Date(eventItem.first_seen).toISOString().slice(0, 16));
-    $('#last_seen').val(new Date(eventItem.last_seen).toISOString().slice(0, 16));
-    $('#created_at').val(formatDate(eventItem.created_at));
-    $('#updated_at').val(formatDate(eventItem.updated_at));
+    setValue('event_id', eventItem.event_id);
+    setValue('title', eventItem.title);
+    setValue('summary', eventItem.summary);
+    setValue('description', eventItem.description);
+    setValue('status', eventItem.status);
+    setValue('severity', eventItem.severity);
+    setValue('first_seen', new Date(eventItem.first_seen).toISOString().slice(0, 16));
+    setValue('last_seen', new Date(eventItem.last_seen).toISOString().slice(0, 16));
+    setValue('created_at', formatDate(eventItem.created_at));
+    setValue('updated_at', formatDate(eventItem.updated_at));
   };
 
   renderer.domElement.addEventListener('wheel', (event) => {
@@ -139,10 +144,10 @@ document.addEventListener('DOMContentLoaded', () => {
     rebuildMeshes();
   });
 
-  $('#event-form').on('submit', (submitEvent) => {
+  form.addEventListener('submit', (submitEvent) => {
     submitEvent.preventDefault();
 
-    const selectedId = $('#event_id').val().toString();
+    const selectedId = getValue('event_id');
     const selectedIndex = window.sessionEvents.findIndex((eventItem) => eventItem.event_id === selectedId);
     if (selectedIndex < 0) {
       return;
@@ -150,13 +155,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const updatedEvent = new window.SessionEvent({
       event_id: selectedId,
-      title: $('#title').val().toString(),
-      summary: $('#summary').val().toString(),
-      description: $('#description').val().toString(),
-      status: $('#status').val().toString(),
-      severity: $('#severity').val().toString(),
-      first_seen: $('#first_seen').val().toString(),
-      last_seen: $('#last_seen').val().toString(),
+      title: getValue('title'),
+      summary: getValue('summary'),
+      description: getValue('description'),
+      status: getValue('status'),
+      severity: getValue('severity'),
+      first_seen: getValue('first_seen'),
+      last_seen: getValue('last_seen'),
       created_at: window.sessionEvents[selectedIndex].created_at,
       updated_at: new Date().toISOString(),
     });
@@ -169,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   window.addEventListener('resize', () => {
-    const width = canvasHost.clientWidth;
+    const width = Math.max(canvasHost.clientWidth, 300);
     camera.aspect = width / 420;
     camera.updateProjectionMatrix();
     renderer.setSize(width, 420);
